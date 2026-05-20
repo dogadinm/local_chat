@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from backend.adapters.registry import registry
 from backend.pipeline import Pipeline
 import os
+import json
 
 router = APIRouter(prefix="/v1")
 
@@ -33,7 +34,7 @@ def chat(request: ChatRequest):
     if request.stream:
         def generator():
             for chunk in pipeline.stream(request.messages):
-                yield f"data: {chunk}\n\n"
+                yield f"data: {json.dumps({'choices': [{'delta': {'content': chunk}}]})}\n\n"
             yield "data: [DONE]\n\n"
         return StreamingResponse(generator(), media_type="text/event-stream")
 
