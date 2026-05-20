@@ -2,6 +2,7 @@ import importlib
 import pkgutil
 from backend.adapters.base import ModelAdapter
 
+
 class ModelRegistry:
     def __init__(self):
         self._adapters: list[type[ModelAdapter]] = []
@@ -12,7 +13,8 @@ class ModelRegistry:
             self._adapters.append(adapter_cls)
 
     def auto_discover(self) -> None:
-        import backend.adapters as pkg 
+        import backend.adapters as pkg
+
         for _, name, _ in pkgutil.iter_modules(pkg.__path__):
             if name in ("base", "registry"):
                 continue

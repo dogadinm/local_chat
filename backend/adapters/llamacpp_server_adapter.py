@@ -22,13 +22,20 @@ class LlamaCppServerAdapter(ModelAdapter):
         self._model_path = model_path
         cmd = [
             "llama.cpp/llama-server.exe",
-            "--model", model_path,
-            "--port", str(self._port),
-            "--ctx-size", str(kwargs.get("ctx_size", 4096)),
-            "--n-gpu-layers", str(kwargs.get("n_gpu_layers", 0)),
-            "--threads", str(kwargs.get("threads", 4)),
-            "--batch-size", str(kwargs.get("batch_size", 512)),
-            "--parallel", str(kwargs.get("parallel", 1)),
+            "--model",
+            model_path,
+            "--port",
+            str(self._port),
+            "--ctx-size",
+            str(kwargs.get("ctx_size", 4096)),
+            "--n-gpu-layers",
+            str(kwargs.get("n_gpu_layers", 0)),
+            "--threads",
+            str(kwargs.get("threads", 4)),
+            "--batch-size",
+            str(kwargs.get("batch_size", 512)),
+            "--parallel",
+            str(kwargs.get("parallel", 1)),
         ]
         if kwargs.get("flash_attn", False):
             cmd.append("--flash-attn")
