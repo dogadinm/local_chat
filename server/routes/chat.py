@@ -7,6 +7,9 @@ from backend.config import MODELS_DIR
 from server.state import get_registry
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/v1")
 
@@ -26,10 +29,13 @@ def list_models():
 @router.post("/chat/completions")
 def chat(request: ChatRequest, registry: ModelRegistry = Depends(get_registry)):
     model_path = os.path.join(MODELS_DIR, request.model)
+    logger.info(f"Chat request: model={request.model}, stream={request.stream}, messages={request.messages}")
     if not os.path.exists(model_path):
         raise HTTPException(status_code=404, detail=f"Model not found: {request.model}")
 
+    logger.info(f"Loading adapter for: {model_path}")
     pipeline = Pipeline(registry.get(model_path))
+    logger.info(f"Adapter ready, generating response")
 
     if request.stream:
 

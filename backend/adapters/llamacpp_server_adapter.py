@@ -3,9 +3,12 @@ import time
 import httpx
 import json
 import socket
+import logging
 
 from typing import Iterator
 from backend.adapters.base import ModelAdapter
+
+logger = logging.getLogger(__name__)
 
 
 class LlamaCppServerAdapter(ModelAdapter):
@@ -28,6 +31,7 @@ class LlamaCppServerAdapter(ModelAdapter):
 
     def load(self, model_path: str, **kwargs) -> None:
         self._model_path = model_path
+        logger.info(f"Starting llama-server: model={model_path}, port={self._port}, n_gpu_layers={kwargs.get('n_gpu_layers', -1)}")
         cmd = [
             "llama.cpp/llama-server.exe",
             "--model",
@@ -37,7 +41,7 @@ class LlamaCppServerAdapter(ModelAdapter):
             "--ctx-size",
             str(kwargs.get("ctx_size", 4096)),
             "--n-gpu-layers",
-            str(kwargs.get("n_gpu_layers", 0)),
+            str(kwargs.get("n_gpu_layers", -1)),
             "--threads",
             str(kwargs.get("threads", 4)),
             "--batch-size",
@@ -53,6 +57,7 @@ class LlamaCppServerAdapter(ModelAdapter):
             stderr=subprocess.DEVNULL,
         )
         self._wait_ready()
+        logger.info(f"llama-server ready on {self._server_url}")
 
     def _wait_ready(self, timeout: int = 60) -> None:
         deadline = time.time() + timeout
