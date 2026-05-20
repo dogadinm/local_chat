@@ -5,7 +5,7 @@ from backend.adapters.registry import registry
 from backend.pipeline import Pipeline
 import os
 
-router = APIRouter()
+router = APIRouter(prefix="/v1")
 
 
 class ChatRequest(BaseModel):
@@ -14,14 +14,14 @@ class ChatRequest(BaseModel):
     stream: bool = False
 
 
-@router.get("/v1/models")
+@router.get("/models")
 def list_models():
     models_dir = os.getenv("MODELS_DIR", "models/")
     files = [f for f in os.listdir(models_dir) if f.endswith(".gguf")]
     return {"models": files}
 
 
-@router.post("/v1/chat/completions")
+@router.post("/chat/completions")
 def chat(request: ChatRequest):
     model_path = os.path.join(os.getenv("MODELS_DIR", "models/"), request.model)
     if not os.path.exists(model_path):
