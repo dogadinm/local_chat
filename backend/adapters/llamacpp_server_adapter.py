@@ -2,17 +2,25 @@ import subprocess
 import time
 import httpx
 import json
+import socket
 
 from typing import Iterator
 from backend.adapters.base import ModelAdapter
 
 
 class LlamaCppServerAdapter(ModelAdapter):
-    def __init__(self):
-        self._process: subprocess.Popen | None = None
-        self._model_path: str | None = None
-        self._port: int = 8080
-        self._server_url: str = f"http://127.0.0.1:{self._port}"
+    def __init__(self, port: int | None = None, host: str = "127.0.0.1"):
+        self._process = None
+        self._model_path = None
+        self._host = host
+        self._port = port if port is not None else self._find_free_port()
+        self._server_url = f"http://{self._host}:{self._port}"
+
+    @staticmethod
+    def _find_free_port() -> int:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(("", 0))
+            return s.getsockname()[1]
 
     @classmethod
     def supports(cls, model_path: str) -> bool:
