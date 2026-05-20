@@ -12,3 +12,4 @@ models/
 
 # llama.cpp binaries
 llama.cpp/
+.env
